@@ -1,6 +1,9 @@
 buildscript {
     ext {
         compose_version = '1.1.1'
+        compile_sdk = 31
+        min_sdk = 22
+        target_sdk = 31
     }
 }// Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
