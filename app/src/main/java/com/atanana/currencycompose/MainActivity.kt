@@ -18,8 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CurrencyComposeTheme {
-                val state = viewModel.stateFlow.collectAsState()
-                CurrencyApp(mainState = state.value, actions = viewModel)
+                CurrencyApp(mainState = viewModel.state, actions = viewModel)
             }
         }
     }
