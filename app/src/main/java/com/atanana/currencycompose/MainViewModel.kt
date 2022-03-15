@@ -32,20 +32,20 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel() {
         }
     }
 
-    private fun recalculateCurrencies() {
-        state.update { currentState ->
-            val amount = currentState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
+    private fun recalculateCurrencies(block: ((MainState) -> MainState)? = null) {
+        state.update { oldState ->
+            val newState = if (block != null) block(oldState) else oldState
+            val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
             val items = conversions.conversionRates.map { (currency, value) -> CurrencyItem(currency, value * amount) }
-            currentState.copy(currencies = items)
+            newState.copy(currencies = items)
         }
     }
 
     fun onAmountChanged(amount: String) {
-        state.update { currentState ->
+        recalculateCurrencies() { currentState ->
             val newCurrencySelectorState = currentState.currencySelectorState.copy(amount = amount)
             currentState.copy(currencySelectorState = newCurrencySelectorState)
         }
-        recalculateCurrencies()
     }
 }
 
