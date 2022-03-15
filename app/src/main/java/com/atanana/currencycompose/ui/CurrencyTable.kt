@@ -14,8 +14,8 @@ import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 
 @Composable
-fun CurrencyTable(currencies: List<CurrencyItem>) {
-    LazyColumn(contentPadding = PaddingValues(16.dp)) {
+fun CurrencyTable(currencies: List<CurrencyItem>, modifier: Modifier = Modifier) {
+    LazyColumn(contentPadding = PaddingValues(16.dp), modifier = modifier) {
         items(
             items = currencies,
             key = { it.currency },

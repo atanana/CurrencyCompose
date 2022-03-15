@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxWidth()
                                 .background(MaterialTheme.colors.onSurface)
                         )
-                        CurrencyTable(currencies = state.value.currencies)
+                        CurrencyTable(currencies = state.value.currencies, Modifier.fillMaxWidth())
                     }
                 }
             }
