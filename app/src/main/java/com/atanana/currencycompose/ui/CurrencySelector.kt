@@ -16,11 +16,11 @@ import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 
 @Composable
-fun CurrencySelector(state: CurrencySelectorState) {
+fun CurrencySelector(state: CurrencySelectorState, onAmountChanged: (String) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
-            value = state.amount.toString(),
-            onValueChange = {},
+            value = state.amount,
+            onValueChange = onAmountChanged,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
@@ -33,8 +33,8 @@ fun CurrencySelector(state: CurrencySelectorState) {
 @Composable
 fun CurrencySelectorPreview() {
     CurrencyComposeTheme {
-        CurrencySelector(CurrencySelectorState(0.0, "USD"))
+        CurrencySelector(CurrencySelectorState("0", "USD")) {}
     }
 }
 
-data class CurrencySelectorState(val amount: Double, val code: String)
+data class CurrencySelectorState(val amount: String, val code: String)

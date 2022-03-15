@@ -11,13 +11,12 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(private val api: Api) : ViewModel() {
 
-    private val state = MutableStateFlow(MainState(CurrencySelectorState(0.0, "USD")))
+    private val state = MutableStateFlow(MainState(CurrencySelectorState("0", "USD")))
     val stateFlow: StateFlow<MainState> = state
 
     fun onAmountChanged(amount: String) {
-        val amountDouble = amount.toDoubleOrNull() ?: return
         val currentState = state.value
-        val newCurrencySelectorState = currentState.currencySelectorState.copy(amount = amountDouble)
+        val newCurrencySelectorState = currentState.currencySelectorState.copy(amount = amount)
         state.value = currentState.copy(currencySelectorState = newCurrencySelectorState)
     }
 }
