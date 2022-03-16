@@ -2,6 +2,7 @@ package com.atanana.currencycompose.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -20,6 +21,7 @@ fun CurrencyApp(state: MainState, actions: CurrencyAppActions) {
         when (state) {
             is MainState.Data -> MainContent(state, actions)
             is MainState.Error -> Error(state)
+            is MainState.Loading -> Loading()
         }
     }
 }
@@ -42,6 +44,13 @@ private fun MainContent(state: MainState.Data, actions: CurrencyAppActions) {
 private fun Error(state: MainState.Error) {
     Box(modifier = Modifier.fillMaxSize()) {
         Text(text = state.message, Modifier.align(Alignment.Center))
+    }
+}
+
+@Composable
+fun Loading() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        CircularProgressIndicator(Modifier.align(Alignment.Center))
     }
 }
 

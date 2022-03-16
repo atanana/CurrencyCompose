@@ -27,6 +27,7 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
         viewModelScope.launch {
             try {
                 conversions = api.getConversions("USD")
+                state = MainState.Data(CurrencySelectorState("1", "USD"), emptyList())
                 recalculateCurrencies()
             } catch (e: Exception) {
                 Timber.e(e)
