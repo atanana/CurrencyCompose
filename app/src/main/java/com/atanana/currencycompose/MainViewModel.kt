@@ -12,6 +12,7 @@ import com.atanana.currencycompose.ui.CurrencyItem
 import com.atanana.currencycompose.ui.CurrencySelectorState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +29,7 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
                 conversions = api.getConversions("USD")
                 recalculateCurrencies()
             } catch (e: Exception) {
+                Timber.e(e)
                 //todo handle exception
             }
         }
