@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.collectAsState
 import com.atanana.currencycompose.ui.CurrencyApp
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,7 +17,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CurrencyComposeTheme {
-                CurrencyApp(mainState = viewModel.state, actions = viewModel)
+                CurrencyApp(state = viewModel.state, actions = viewModel)
             }
         }
     }

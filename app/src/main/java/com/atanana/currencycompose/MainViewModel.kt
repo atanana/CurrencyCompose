@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), CurrencyAppActions {
 
-    var state by mutableStateOf(MainState(CurrencySelectorState("1", "USD"), emptyList()))
+    var state by mutableStateOf<MainState>(MainState.Loading)
         private set
 
     private lateinit var conversions: ConversionsResult
@@ -30,16 +30,19 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
                 recalculateCurrencies()
             } catch (e: Exception) {
                 Timber.e(e)
-                //todo handle exception
+                state = MainState.Error("Cannot load data!")
             }
         }
     }
 
-    private fun recalculateCurrencies(block: ((MainState) -> MainState)? = null) {
-        val newState = if (block != null) block(state) else state
-        val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
-        val items = conversions.conversionRates.map { (currency, value) -> CurrencyItem(currency, value * amount) }
-        state = newState.copy(currencies = items)
+    private fun recalculateCurrencies(block: ((MainState.Data) -> MainState.Data)? = null) {
+        val state = state
+        if (state is MainState.Data) {
+            val newState = if (block != null) block(state) else state
+            val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
+            val items = conversions.conversionRates.map { (currency, value) -> CurrencyItem(currency, value * amount) }
+            this.state = newState.copy(currencies = items)
+        }
     }
 
     override fun onAmountChanged(amount: String) {
@@ -50,4 +53,11 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
     }
 }
 
-data class MainState(val currencySelectorState: CurrencySelectorState, val currencies: List<CurrencyItem>)
+sealed class MainState {
+
+    object Loading : MainState()
+
+    data class Error(val message: String) : MainState()
+
+    data class Data(val currencySelectorState: CurrencySelectorState, val currencies: List<CurrencyItem>) : MainState()
+}
