@@ -15,6 +15,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
+private const val DEFAULT_AMOUNT = "1"
+
 @HiltViewModel
 class MainViewModel @Inject constructor(private val repository: CurrencyRepository) : ViewModel(), CurrencyAppActions {
 
@@ -24,11 +26,17 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     private lateinit var conversions: Map<Currency, Double>
 
     init {
+        loadConversions(Currency("USD"))
+    }
+
+    private fun loadConversions(currency: Currency) {
         viewModelScope.launch {
             try {
-                conversions = repository.getConversions(Currency("USD"))
+                state = MainState.Loading
+                conversions = repository.getConversions(currency)
+                val amount = (state as? MainState.Data)?.currencySelectorState?.amount ?: DEFAULT_AMOUNT
                 val allCurrencies = conversions.keys.toList()
-                state = MainState.Data(CurrencySelectorState("1", Currency("USD")), emptyList(), allCurrencies)
+                state = MainState.Data(CurrencySelectorState(amount, currency), emptyList(), allCurrencies)
                 recalculateCurrencies()
             } catch (e: Exception) {
                 Timber.e(e)
@@ -37,13 +45,11 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
         }
     }
 
-    private fun recalculateCurrencies(block: ((MainState.Data) -> MainState.Data)? = null) {
-        mapData { data ->
-            val newState = if (block != null) block(data) else data
-            val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
-            val items = conversions.map { (currency, value) -> CurrencyItem(currency, value * amount) }
-            newState.copy(currencies = items)
-        }
+    private fun recalculateCurrencies(block: ((MainState.Data) -> MainState.Data)? = null) = mapData { data ->
+        val newState = if (block != null) block(data) else data
+        val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
+        val items = conversions.map { (currency, value) -> CurrencyItem(currency, value * amount) }
+        newState.copy(currencies = items)
     }
 
     private fun mapData(block: ((MainState.Data) -> MainState.Data)) {
@@ -61,9 +67,7 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     }
 
     override fun onCurrencySelected(currency: Currency) {
-        mapData { data ->
-            data.copy(currencySelectorState = data.currencySelectorState.copy(currency = currency))
-        }
+        loadConversions(currency)
     }
 }
 
