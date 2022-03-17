@@ -1,5 +1,6 @@
 package com.atanana.currencycompose
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -75,8 +76,10 @@ sealed class MainState {
 
     object Loading : MainState()
 
+    @Immutable
     data class Error(val message: String) : MainState()
 
+    @Immutable
     data class Data(
         val currencySelectorState: CurrencySelectorState,
         val currencies: List<CurrencyItem>,

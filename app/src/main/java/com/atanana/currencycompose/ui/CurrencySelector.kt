@@ -55,4 +55,5 @@ fun CurrencySelectorPreview() {
     }
 }
 
+@Immutable
 data class CurrencySelectorState(val amount: String, val currency: Currency)
