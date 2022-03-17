@@ -27,12 +27,13 @@ fun CurrencyApp(state: MainState, actions: CurrencyAppActions) {
 
 @Composable
 private fun MainContent(state: MainState.Data, actions: CurrencyAppActions) {
-    var currencySelectorDialogState by remember { mutableStateOf(false) }
-
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        CurrencySelector(state.currencySelectorState, actions::onAmountChanged) {
-            currencySelectorDialogState = true
-        }
+        CurrencySelector(
+            state.currencySelectorState,
+            state.allCurrencies,
+            actions::onAmountChanged,
+            actions::onCurrencySelected
+        )
         Spacer(
             modifier = Modifier
                 .height(1.dp)
@@ -40,12 +41,6 @@ private fun MainContent(state: MainState.Data, actions: CurrencyAppActions) {
                 .background(MaterialTheme.colors.onSurface)
         )
         CurrencyTable(currencies = state.currencies, Modifier.fillMaxWidth())
-
-        if (currencySelectorDialogState) {
-            CurrencySelectorDialog(state.allCurrencies, actions::onCurrencySelected) {
-                currencySelectorDialogState = false
-            }
-        }
     }
 }
 

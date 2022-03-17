@@ -8,7 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -19,9 +19,12 @@ import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 @Composable
 fun CurrencySelector(
     state: CurrencySelectorState,
+    allCurrencies: List<String>,
     onAmountChanged: (String) -> Unit,
-    onCurrencyClick: () -> Unit
+    onCurrencySelected: (String) -> Unit
 ) {
+    var dialogState by remember { mutableStateOf(false) }
+
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
             value = state.amount,
@@ -30,8 +33,14 @@ fun CurrencySelector(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.size(16.dp))
-        Button(onClick = onCurrencyClick) {
+        Button(onClick = { dialogState = true }) {
             Text(text = state.code)
+        }
+    }
+
+    if (dialogState) {
+        CurrencySelectorDialog(allCurrencies, onCurrencySelected) {
+            dialogState = false
         }
     }
 }
@@ -40,7 +49,7 @@ fun CurrencySelector(
 @Composable
 fun CurrencySelectorPreview() {
     CurrencyComposeTheme {
-        CurrencySelector(CurrencySelectorState("0", "USD"), {}) {}
+        CurrencySelector(CurrencySelectorState("0", "USD"), listOf(), {}) {}
     }
 }
 
