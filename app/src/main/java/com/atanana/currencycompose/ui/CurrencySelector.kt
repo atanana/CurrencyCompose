@@ -30,7 +30,8 @@ fun CurrencySelector(
             value = state.amount,
             onValueChange = onAmountChanged,
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.size(16.dp))
         Button(onClick = { dialogState = true }) {
