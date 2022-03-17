@@ -26,15 +26,14 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     private lateinit var conversions: Map<Currency, Double>
 
     init {
-        loadConversions(Currency("USD"))
+        loadConversions("1", Currency("USD"))
     }
 
-    private fun loadConversions(currency: Currency) {
+    private fun loadConversions(amount: String, currency: Currency) {
         viewModelScope.launch {
             try {
                 state = MainState.Loading
                 conversions = repository.getConversions(currency)
-                val amount = (state as? MainState.Data)?.currencySelectorState?.amount ?: DEFAULT_AMOUNT
                 val allCurrencies = conversions.keys.toList()
                 state = MainState.Data(CurrencySelectorState(amount, currency), emptyList(), allCurrencies)
                 recalculateCurrencies()
@@ -67,7 +66,8 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     }
 
     override fun onCurrencySelected(currency: Currency) {
-        loadConversions(currency)
+        val amount = (state as? MainState.Data)?.currencySelectorState?.amount ?: DEFAULT_AMOUNT
+        loadConversions(amount, currency)
     }
 }
 
