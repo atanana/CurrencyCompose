@@ -55,7 +55,11 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
     }
 
     override fun onCurrencySelected(currency: String) {
-
+        val state = state
+        if (state is MainState.Data) {
+            val newCurrencySelectorState = state.currencySelectorState.copy(code = currency)
+            this.state = state.copy(newCurrencySelectorState)
+        }
     }
 }
 
