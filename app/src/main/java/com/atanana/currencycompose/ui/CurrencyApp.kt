@@ -6,10 +6,9 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.MainState
@@ -28,8 +27,12 @@ fun CurrencyApp(state: MainState, actions: CurrencyAppActions) {
 
 @Composable
 private fun MainContent(state: MainState.Data, actions: CurrencyAppActions) {
+    var currencySelectorDialogState by remember { mutableStateOf(false) }
+
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        CurrencySelector(state.currencySelectorState, actions::onAmountChanged)
+        CurrencySelector(state.currencySelectorState, actions::onAmountChanged) {
+            currencySelectorDialogState = true
+        }
         Spacer(
             modifier = Modifier
                 .height(1.dp)
@@ -37,6 +40,12 @@ private fun MainContent(state: MainState.Data, actions: CurrencyAppActions) {
                 .background(MaterialTheme.colors.onSurface)
         )
         CurrencyTable(currencies = state.currencies, Modifier.fillMaxWidth())
+
+        if (currencySelectorDialogState) {
+            CurrencySelectorDialog(state.allCurrencies, actions::onCurrencySelected) {
+                currencySelectorDialogState = false
+            }
+        }
     }
 }
 
@@ -61,11 +70,14 @@ fun PreviewCurrencyAppMainContent() {
         CurrencySelectorState("123", "USD"), listOf(
             CurrencyItem("RUB", 100.0),
             CurrencyItem("BYN", 5.0)
-        )
+        ), emptyList()
     )
     CurrencyComposeTheme {
         CurrencyApp(state = state, actions = object : CurrencyAppActions {
             override fun onAmountChanged(amount: String) {
+            }
+
+            override fun onCurrencySelected(currency: String) {
             }
         })
     }
@@ -81,4 +93,6 @@ fun PreviewCurrencyAppError() {
 
 interface CurrencyAppActions {
     fun onAmountChanged(amount: String)
+
+    fun onCurrencySelected(currency: String)
 }

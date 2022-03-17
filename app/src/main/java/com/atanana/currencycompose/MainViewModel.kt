@@ -27,7 +27,8 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
         viewModelScope.launch {
             try {
                 conversions = api.getConversions("USD")
-                state = MainState.Data(CurrencySelectorState("1", "USD"), emptyList())
+                val allCurrencies = conversions.conversionRates.keys.toList()
+                state = MainState.Data(CurrencySelectorState("1", "USD"), emptyList(), allCurrencies)
                 recalculateCurrencies()
             } catch (e: Exception) {
                 Timber.e(e)
@@ -52,6 +53,10 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
             currentState.copy(currencySelectorState = newCurrencySelectorState)
         }
     }
+
+    override fun onCurrencySelected(currency: String) {
+
+    }
 }
 
 sealed class MainState {
@@ -60,5 +65,9 @@ sealed class MainState {
 
     data class Error(val message: String) : MainState()
 
-    data class Data(val currencySelectorState: CurrencySelectorState, val currencies: List<CurrencyItem>) : MainState()
+    data class Data(
+        val currencySelectorState: CurrencySelectorState,
+        val currencies: List<CurrencyItem>,
+        val allCurrencies: List<String>
+    ) : MainState()
 }

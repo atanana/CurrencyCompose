@@ -25,7 +25,7 @@ fun CurrencyTable(currencies: List<CurrencyItem>, modifier: Modifier = Modifier)
 }
 
 @Composable
-fun CurrencyTableItem(item: CurrencyItem) {
+private fun CurrencyTableItem(item: CurrencyItem) {
     Row {
         Text(text = "%.3f".format(item.amount))
         Spacer(modifier = Modifier.size(8.dp))

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -16,7 +17,11 @@ import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 
 @Composable
-fun CurrencySelector(state: CurrencySelectorState, onAmountChanged: (String) -> Unit) {
+fun CurrencySelector(
+    state: CurrencySelectorState,
+    onAmountChanged: (String) -> Unit,
+    onCurrencyClick: () -> Unit
+) {
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
             value = state.amount,
@@ -25,7 +30,9 @@ fun CurrencySelector(state: CurrencySelectorState, onAmountChanged: (String) -> 
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.size(16.dp))
-        Text(text = state.code)
+        Button(onClick = onCurrencyClick) {
+            Text(text = state.code)
+        }
     }
 }
 
@@ -33,7 +40,7 @@ fun CurrencySelector(state: CurrencySelectorState, onAmountChanged: (String) -> 
 @Composable
 fun CurrencySelectorPreview() {
     CurrencyComposeTheme {
-        CurrencySelector(CurrencySelectorState("0", "USD")) {}
+        CurrencySelector(CurrencySelectorState("0", "USD"), {}) {}
     }
 }
 
