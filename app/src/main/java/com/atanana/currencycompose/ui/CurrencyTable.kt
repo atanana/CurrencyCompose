@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 
 @Composable
@@ -18,7 +19,7 @@ fun CurrencyTable(currencies: List<CurrencyItem>, modifier: Modifier = Modifier)
     LazyColumn(contentPadding = PaddingValues(16.dp), modifier = modifier) {
         items(
             items = currencies,
-            key = { it.currency },
+            key = { it.currency.value },
             itemContent = { CurrencyTableItem(item = it) }
         )
     }
@@ -29,7 +30,7 @@ private fun CurrencyTableItem(item: CurrencyItem) {
     Row {
         Text(text = "%.3f".format(item.amount))
         Spacer(modifier = Modifier.size(8.dp))
-        Text(text = item.currency)
+        Text(text = item.currency.value)
     }
 }
 
@@ -38,12 +39,12 @@ private fun CurrencyTableItem(item: CurrencyItem) {
 fun CurrencyTablePreview() {
     CurrencyComposeTheme {
         val currencies = listOf(
-            CurrencyItem("USD", 1.0),
-            CurrencyItem("RUB", 300.0),
-            CurrencyItem("BYN", 5.0)
+            CurrencyItem(Currency("USD"), 1.0),
+            CurrencyItem(Currency("RUB"), 300.0),
+            CurrencyItem(Currency("BYN"), 5.0)
         )
         CurrencyTable(currencies = currencies)
     }
 }
 
-data class CurrencyItem(val currency: String, val amount: Double)
+data class CurrencyItem(val currency: Currency, val amount: Double)

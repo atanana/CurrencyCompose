@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.atanana.currencycompose.data.network.Api
-import com.atanana.currencycompose.data.network.ConversionsResult
+import com.atanana.currencycompose.data.Currency
+import com.atanana.currencycompose.data.CurrencyRepository
 import com.atanana.currencycompose.ui.CurrencyAppActions
 import com.atanana.currencycompose.ui.CurrencyItem
 import com.atanana.currencycompose.ui.CurrencySelectorState
@@ -16,19 +16,19 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), CurrencyAppActions {
+class MainViewModel @Inject constructor(private val repository: CurrencyRepository) : ViewModel(), CurrencyAppActions {
 
     var state by mutableStateOf<MainState>(MainState.Loading)
         private set
 
-    private lateinit var conversions: ConversionsResult
+    private lateinit var conversions: Map<Currency, Double>
 
     init {
         viewModelScope.launch {
             try {
-                conversions = api.getConversions("USD")
-                val allCurrencies = conversions.conversionRates.keys.toList()
-                state = MainState.Data(CurrencySelectorState("1", "USD"), emptyList(), allCurrencies)
+                conversions = repository.getConversions(Currency("USD"))
+                val allCurrencies = conversions.keys.toList()
+                state = MainState.Data(CurrencySelectorState("1", Currency("USD")), emptyList(), allCurrencies)
                 recalculateCurrencies()
             } catch (e: Exception) {
                 Timber.e(e)
@@ -41,7 +41,7 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
         mapData { data ->
             val newState = if (block != null) block(data) else data
             val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
-            val items = conversions.conversionRates.map { (currency, value) -> CurrencyItem(currency, value * amount) }
+            val items = conversions.map { (currency, value) -> CurrencyItem(currency, value * amount) }
             newState.copy(currencies = items)
         }
     }
@@ -60,9 +60,9 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
         }
     }
 
-    override fun onCurrencySelected(currency: String) {
+    override fun onCurrencySelected(currency: Currency) {
         mapData { data ->
-            data.copy(currencySelectorState = data.currencySelectorState.copy(code = currency))
+            data.copy(currencySelectorState = data.currencySelectorState.copy(currency = currency))
         }
     }
 }
@@ -76,6 +76,6 @@ sealed class MainState {
     data class Data(
         val currencySelectorState: CurrencySelectorState,
         val currencies: List<CurrencyItem>,
-        val allCurrencies: List<String>
+        val allCurrencies: List<Currency>
     ) : MainState()
 }

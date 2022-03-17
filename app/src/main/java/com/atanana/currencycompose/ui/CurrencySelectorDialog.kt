@@ -14,11 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.atanana.currencycompose.data.Currency
 
 @Composable
 fun CurrencySelectorDialog(
-    currencies: List<String>,
-    onSelect: (String) -> Unit,
+    currencies: List<Currency>,
+    onSelect: (Currency) -> Unit,
     onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
@@ -27,7 +28,7 @@ fun CurrencySelectorDialog(
                 LazyColumn(contentPadding = PaddingValues(vertical = 16.dp), modifier = Modifier.fillMaxWidth()) {
                     items(
                         items = currencies,
-                        key = { it },
+                        key = { it.value },
                         itemContent = { CurrencyItem(it, onSelect, onDismiss) }
                     )
                 }
@@ -38,11 +39,11 @@ fun CurrencySelectorDialog(
 
 @Composable
 private fun CurrencyItem(
-    currency: String,
-    onSelect: (String) -> Unit,
+    currency: Currency,
+    onSelect: (Currency) -> Unit,
     onDismiss: () -> Unit
 ) {
-    Text(text = currency,
+    Text(text = currency.value,
         Modifier
             .clickable {
                 onSelect(currency)

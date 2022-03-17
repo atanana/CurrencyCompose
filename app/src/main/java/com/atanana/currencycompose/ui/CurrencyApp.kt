@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.MainState
+import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 
 @Composable
@@ -62,9 +63,9 @@ fun Loading() {
 @Composable
 fun PreviewCurrencyAppMainContent() {
     val state = MainState.Data(
-        CurrencySelectorState("123", "USD"), listOf(
-            CurrencyItem("RUB", 100.0),
-            CurrencyItem("BYN", 5.0)
+        CurrencySelectorState("123", Currency("USD")), listOf(
+            CurrencyItem(Currency("RUB"), 100.0),
+            CurrencyItem(Currency("BYN"), 5.0)
         ), emptyList()
     )
     CurrencyComposeTheme {
@@ -72,7 +73,7 @@ fun PreviewCurrencyAppMainContent() {
             override fun onAmountChanged(amount: String) {
             }
 
-            override fun onCurrencySelected(currency: String) {
+            override fun onCurrencySelected(currency: Currency) {
             }
         })
     }
@@ -89,5 +90,5 @@ fun PreviewCurrencyAppError() {
 interface CurrencyAppActions {
     fun onAmountChanged(amount: String)
 
-    fun onCurrencySelected(currency: String)
+    fun onCurrencySelected(currency: Currency)
 }

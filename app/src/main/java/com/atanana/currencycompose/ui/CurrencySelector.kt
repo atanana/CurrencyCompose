@@ -14,14 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 
 @Composable
 fun CurrencySelector(
     state: CurrencySelectorState,
-    allCurrencies: List<String>,
+    allCurrencies: List<Currency>,
     onAmountChanged: (String) -> Unit,
-    onCurrencySelected: (String) -> Unit
+    onCurrencySelected: (Currency) -> Unit
 ) {
     var dialogState by remember { mutableStateOf(false) }
 
@@ -35,7 +36,7 @@ fun CurrencySelector(
         )
         Spacer(modifier = Modifier.size(16.dp))
         Button(onClick = { dialogState = true }) {
-            Text(text = state.code)
+            Text(text = state.currency.value)
         }
     }
 
@@ -50,8 +51,8 @@ fun CurrencySelector(
 @Composable
 fun CurrencySelectorPreview() {
     CurrencyComposeTheme {
-        CurrencySelector(CurrencySelectorState("0", "USD"), listOf(), {}) {}
+        CurrencySelector(CurrencySelectorState("0", Currency("USD")), listOf(), {}) {}
     }
 }
 
-data class CurrencySelectorState(val amount: String, val code: String)
+data class CurrencySelectorState(val amount: String, val currency: Currency)
