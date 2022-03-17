@@ -38,12 +38,18 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
     }
 
     private fun recalculateCurrencies(block: ((MainState.Data) -> MainState.Data)? = null) {
-        val state = state
-        if (state is MainState.Data) {
-            val newState = if (block != null) block(state) else state
+        mapData { data ->
+            val newState = if (block != null) block(data) else data
             val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
             val items = conversions.conversionRates.map { (currency, value) -> CurrencyItem(currency, value * amount) }
-            this.state = newState.copy(currencies = items)
+            newState.copy(currencies = items)
+        }
+    }
+
+    private fun mapData(block: ((MainState.Data) -> MainState.Data)) {
+        val state = state
+        if (state is MainState.Data) {
+            this.state = block(state)
         }
     }
 
@@ -55,10 +61,8 @@ class MainViewModel @Inject constructor(private val api: Api) : ViewModel(), Cur
     }
 
     override fun onCurrencySelected(currency: String) {
-        val state = state
-        if (state is MainState.Data) {
-            val newCurrencySelectorState = state.currencySelectorState.copy(code = currency)
-            this.state = state.copy(newCurrencySelectorState)
+        mapData { data ->
+            data.copy(currencySelectorState = data.currencySelectorState.copy(code = currency))
         }
     }
 }
