@@ -45,7 +45,12 @@ private fun MainContent(state: MainState.Data, actions: CurrencyAppActions) {
                 .fillMaxWidth()
                 .background(MaterialTheme.colors.onSurface)
         )
-        CurrencyTable(currencies = state.currencies, Modifier.fillMaxWidth())
+        CurrencyTable(
+            state.currencies,
+            state.allCurrencies,
+            actions::onCurrenciesListChanged,
+            Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -79,6 +84,9 @@ fun PreviewCurrencyAppMainContent() {
 
             override fun onCurrencySelected(currency: Currency) {
             }
+
+            override fun onCurrenciesListChanged(currencies: List<Currency>) {
+            }
         })
     }
 }
@@ -92,7 +100,10 @@ fun PreviewCurrencyAppError() {
 }
 
 interface CurrencyAppActions {
+
     fun onAmountChanged(amount: String)
 
     fun onCurrencySelected(currency: Currency)
+
+    fun onCurrenciesListChanged(currencies: List<Currency>)
 }

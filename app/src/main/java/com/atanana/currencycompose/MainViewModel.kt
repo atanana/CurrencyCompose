@@ -70,6 +70,9 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
         val amount = (state as? MainState.Data)?.currencySelectorState?.amount ?: DEFAULT_AMOUNT
         loadConversions(amount, currency)
     }
+
+    override fun onCurrenciesListChanged(currencies: List<Currency>) {
+    }
 }
 
 sealed class MainState {
