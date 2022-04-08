@@ -5,8 +5,8 @@ buildscript {
         target_sdk = 31
 
         compose_version = '1.1.1'
-        coroutines_version = '1.5.2'
-        hilt_version = '2.38.1'
+        coroutines_version = '1.6.1-native-mt'
+        hilt_version = '2.41'
     }
 
     dependencies {
