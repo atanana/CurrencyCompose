@@ -22,6 +22,7 @@ import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 import com.atanana.currencycompose.ui.theme.DOUBLE_PADDING
 import com.atanana.currencycompose.ui.theme.HALF_PADDING
 import com.atanana.currencycompose.ui.theme.PADDING
+import com.atanana.currencycompose.update
 
 @Composable
 fun CurrenciesListSelectorDialog(
@@ -29,28 +30,49 @@ fun CurrenciesListSelectorDialog(
     onSelect: (List<Currency>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val items = remember { currencies.map { CurrencySelectedItem(it, true) } }
-
     Dialog(onDismissRequest = onDismiss) {
-        Box(Modifier.padding(vertical = DOUBLE_PADDING)) {
-            Card(elevation = 8.dp, shape = RoundedCornerShape(8.dp)) {
-                Column {
-                    LazyColumn(contentPadding = PaddingValues(vertical = PADDING), modifier = Modifier.weight(1f)) {
-                        items(
-                            items = items,
-                            key = { it.currency.value },
-                            itemContent = { CurrencyItem(it) }
-                        )
+        DialogContent(currencies, onSelect, onDismiss)
+    }
+}
+
+@Composable
+private fun DialogContent(
+    currencies: List<Currency>,
+    onSelect: (List<Currency>) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val items = remember { currencies.map { CurrencySelectedItem(it, true) }.toMutableStateList() }
+
+    Box(Modifier.padding(vertical = DOUBLE_PADDING)) {
+        Card(elevation = 8.dp, shape = RoundedCornerShape(8.dp)) {
+            Column {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                    TextButton(onClick = { items.update { it.copy(isSelected = true) } }) {
+                        Text(text = stringResource(R.string.select_all))
                     }
-                    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                        TextButton(onClick = {
-                            val selectedCurrencies = items.filter { it.isSelected }
-                                .map { it.currency }
-                            onSelect(selectedCurrencies)
-                            onDismiss()
-                        }) {
-                            Text(text = stringResource(R.string.ok))
+                    TextButton(onClick = { items.update { it.copy(isSelected = false) } }) {
+                        Text(text = stringResource(R.string.select_none))
+                    }
+                }
+                LazyColumn(contentPadding = PaddingValues(vertical = PADDING), modifier = Modifier.weight(1f)) {
+                    items(
+                        items = items,
+                        key = { it.currency.value },
+                        itemContent = {
+                            CurrencyItem(it) {
+                                items[items.indexOf(it)] = it.copy(isSelected = !it.isSelected)
+                            }
                         }
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                    TextButton(onClick = {
+                        val selectedCurrencies = items.filter { it.isSelected }
+                            .map { it.currency }
+                        onSelect(selectedCurrencies)
+                        onDismiss()
+                    }) {
+                        Text(text = stringResource(R.string.ok))
                     }
                 }
             }
@@ -59,20 +81,15 @@ fun CurrenciesListSelectorDialog(
 }
 
 @Composable
-private fun CurrencyItem(item: CurrencySelectedItem) {
-    var isSelected by remember { mutableStateOf(item.isSelected) }
-
+private fun CurrencyItem(item: CurrencySelectedItem, onClick: () -> Unit) {
     Row(
         Modifier
-            .clickable {
-                item.isSelected = !item.isSelected
-                isSelected = item.isSelected
-            }
+            .clickable { onClick() }
             .padding(vertical = HALF_PADDING, horizontal = PADDING)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(checked = isSelected, onCheckedChange = null)
+        Checkbox(checked = item.isSelected, onCheckedChange = null)
         Spacer(modifier = Modifier.size(HALF_PADDING))
         Text(text = item.currency.value)
     }
@@ -80,10 +97,14 @@ private fun CurrencyItem(item: CurrencySelectedItem) {
 
 @Preview(showBackground = true)
 @Composable
-fun CurrencyItemPreview() {
+fun CurrencyListSelectorDialogPreview() {
     CurrencyComposeTheme {
-        CurrencyItem(item = CurrencySelectedItem(Currency("USD"), true))
+        val items = listOf(
+            Currency("USD"),
+            Currency("BYN")
+        )
+        DialogContent(items, onSelect = {}) {}
     }
 }
 
-private data class CurrencySelectedItem(val currency: Currency, var isSelected: Boolean)
+private data class CurrencySelectedItem(val currency: Currency, val isSelected: Boolean)

@@ -2,4 +2,6 @@
     <string name="app_name">Currency Compose</string>
 
     <string name="ok">OK</string>
+    <string name="select_all">Select All</string>
+    <string name="select_none">Select None</string>
 </resources>
