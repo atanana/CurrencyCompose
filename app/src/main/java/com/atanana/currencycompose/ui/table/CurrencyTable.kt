@@ -19,8 +19,7 @@ import com.atanana.currencycompose.ui.theme.PADDING
 
 @Composable
 fun CurrencyTable(
-    currencies: List<CurrencyItem>,
-    allCurrencies: List<Currency>,
+    state: CurrencyTableState,
     onCurrenciesListChanged: (List<Currency>) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -28,25 +27,25 @@ fun CurrencyTable(
 
     LazyColumn(contentPadding = PaddingValues(PADDING), modifier = modifier.clickable { dialogState = true }) {
         items(
-            items = currencies,
+            items = state.rows,
             key = { it.currency.value },
-            itemContent = { CurrencyTableItem(item = it) }
+            itemContent = { CurrencyTableItem(row = it) }
         )
     }
 
     if (dialogState) {
-        CurrenciesListSelectorDialog(allCurrencies, onCurrenciesListChanged) {
+        CurrenciesListSelectorDialog(state.selectorItems, onCurrenciesListChanged) {
             dialogState = false
         }
     }
 }
 
 @Composable
-private fun CurrencyTableItem(item: CurrencyItem) {
+private fun CurrencyTableItem(row: CurrencyRow) {
     Row {
-        Text(text = "%.3f".format(item.amount), fontWeight = FontWeight.Bold)
+        Text(text = "%.3f".format(row.amount), fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.size(HALF_PADDING))
-        Text(text = item.currency.value)
+        Text(text = row.currency.value)
     }
 }
 
@@ -55,13 +54,17 @@ private fun CurrencyTableItem(item: CurrencyItem) {
 fun CurrencyTablePreview() {
     CurrencyComposeTheme {
         val currencies = listOf(
-            CurrencyItem(Currency("USD"), 1.0),
-            CurrencyItem(Currency("RUB"), 300.0),
-            CurrencyItem(Currency("BYN"), 5.0)
+            CurrencyRow(Currency("USD"), 1.0),
+            CurrencyRow(Currency("RUB"), 300.0),
+            CurrencyRow(Currency("BYN"), 5.0)
         )
-        CurrencyTable(currencies = currencies, emptyList(), {})
+        val state = CurrencyTableState(currencies, emptyList())
+        CurrencyTable(state, {})
     }
 }
 
 @Immutable
-data class CurrencyItem(val currency: Currency, val amount: Double)
+data class CurrencyRow(val currency: Currency, val amount: Double)
+
+@Immutable
+data class CurrencyTableState(val rows: List<CurrencyRow>, val selectorItems: List<CurrencySelectorItem>)

@@ -10,7 +10,9 @@ import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.data.CurrencyRepository
 import com.atanana.currencycompose.ui.CurrencyAppActions
 import com.atanana.currencycompose.ui.selector.CurrencySelectorState
-import com.atanana.currencycompose.ui.table.CurrencyItem
+import com.atanana.currencycompose.ui.table.CurrencyRow
+import com.atanana.currencycompose.ui.table.CurrencySelectorItem
+import com.atanana.currencycompose.ui.table.CurrencyTableState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,6 +27,7 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
         private set
 
     private lateinit var conversions: Map<Currency, Double>
+    private var selectedCurrencies = emptySet<Currency>()
 
     init {
         loadConversions("1", Currency("USD"))
@@ -35,8 +38,7 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
             try {
                 state = MainState.Loading
                 conversions = repository.getConversions(currency)
-                val allCurrencies = conversions.keys.toList()
-                state = MainState.Data(CurrencySelectorState(amount, currency), emptyList(), allCurrencies)
+                state = createDefaultState(amount, currency)
                 recalculateCurrencies()
             } catch (e: Exception) {
                 Timber.e(e)
@@ -45,11 +47,22 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
         }
     }
 
+    private fun createDefaultState(amount: String, currency: Currency): MainState.Data {
+        val allCurrencies = conversions.keys.toList()
+        selectedCurrencies = allCurrencies.toSet()
+        val currencySelectorState = CurrencySelectorState(amount, currency)
+        val currencyTableState = CurrencyTableState(emptyList(), emptyList())
+        return MainState.Data(currencySelectorState, currencyTableState, allCurrencies)
+    }
+
     private fun recalculateCurrencies(block: ((MainState.Data) -> MainState.Data)? = null) = mapData { data ->
         val newState = if (block != null) block(data) else data
         val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
-        val items = conversions.map { (currency, value) -> CurrencyItem(currency, value * amount) }
-        newState.copy(currencies = items)
+        val currencyRows = conversions
+            .filter { selectedCurrencies.contains(it.key) }
+            .map { (currency, value) -> CurrencyRow(currency, value * amount) }
+        val currencySelectorItems = newState.allCurrencies.map { CurrencySelectorItem(it, selectedCurrencies.contains(it)) }
+        newState.copy(currenciesTableState = CurrencyTableState(currencyRows, currencySelectorItems))
     }
 
     private fun mapData(block: ((MainState.Data) -> MainState.Data)) {
@@ -72,6 +85,8 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     }
 
     override fun onCurrenciesListChanged(currencies: List<Currency>) {
+        selectedCurrencies = currencies.toSet()
+        recalculateCurrencies()
     }
 }
 
@@ -85,7 +100,7 @@ sealed class MainState {
     @Immutable
     data class Data(
         val currencySelectorState: CurrencySelectorState,
-        val currencies: List<CurrencyItem>,
+        val currenciesTableState: CurrencyTableState,
         val allCurrencies: List<Currency>
     ) : MainState()
 }

@@ -15,8 +15,9 @@ import com.atanana.currencycompose.MainState
 import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.ui.selector.CurrencySelector
 import com.atanana.currencycompose.ui.selector.CurrencySelectorState
-import com.atanana.currencycompose.ui.table.CurrencyItem
+import com.atanana.currencycompose.ui.table.CurrencyRow
 import com.atanana.currencycompose.ui.table.CurrencyTable
+import com.atanana.currencycompose.ui.table.CurrencyTableState
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 
 @Composable
@@ -46,8 +47,7 @@ private fun MainContent(state: MainState.Data, actions: CurrencyAppActions) {
                 .background(MaterialTheme.colors.onSurface)
         )
         CurrencyTable(
-            state.currencies,
-            state.allCurrencies,
+            state.currenciesTableState,
             actions::onCurrenciesListChanged,
             Modifier.fillMaxWidth()
         )
@@ -71,12 +71,14 @@ fun Loading() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewCurrencyAppMainContent() {
-    val state = MainState.Data(
-        CurrencySelectorState("123", Currency("USD")), listOf(
-            CurrencyItem(Currency("RUB"), 100.0),
-            CurrencyItem(Currency("BYN"), 5.0)
+    val currencySelectorState = CurrencySelectorState("123", Currency("USD"))
+    val currencyTableState = CurrencyTableState(
+        listOf(
+            CurrencyRow(Currency("RUB"), 100.0),
+            CurrencyRow(Currency("BYN"), 5.0)
         ), emptyList()
     )
+    val state = MainState.Data(currencySelectorState, currencyTableState, emptyList())
     CurrencyComposeTheme {
         CurrencyApp(state = state, actions = object : CurrencyAppActions {
             override fun onAmountChanged(amount: String) {

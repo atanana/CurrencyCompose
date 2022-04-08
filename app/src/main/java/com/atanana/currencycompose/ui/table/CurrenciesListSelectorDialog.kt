@@ -26,7 +26,7 @@ import com.atanana.currencycompose.update
 
 @Composable
 fun CurrenciesListSelectorDialog(
-    currencies: List<Currency>,
+    currencies: List<CurrencySelectorItem>,
     onSelect: (List<Currency>) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -37,11 +37,11 @@ fun CurrenciesListSelectorDialog(
 
 @Composable
 private fun DialogContent(
-    currencies: List<Currency>,
+    currencies: List<CurrencySelectorItem>,
     onSelect: (List<Currency>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val items = remember { currencies.map { CurrencySelectedItem(it, true) }.toMutableStateList() }
+    val items = remember { currencies.toMutableStateList() }
 
     Box(Modifier.padding(vertical = DOUBLE_PADDING)) {
         Card(elevation = 8.dp, shape = RoundedCornerShape(8.dp)) {
@@ -80,7 +80,7 @@ private fun DialogContent(
 }
 
 @Composable
-private fun CurrencyItem(item: CurrencySelectedItem, onClick: () -> Unit) {
+private fun CurrencyItem(item: CurrencySelectorItem, onClick: () -> Unit) {
     Row(
         Modifier
             .clickable { onClick() }
@@ -99,12 +99,12 @@ private fun CurrencyItem(item: CurrencySelectedItem, onClick: () -> Unit) {
 fun CurrencyListSelectorDialogPreview() {
     CurrencyComposeTheme {
         val items = listOf(
-            Currency("USD"),
-            Currency("BYN")
+            CurrencySelectorItem(Currency("USD"), true),
+            CurrencySelectorItem(Currency("BYN"), false)
         )
         DialogContent(items, onSelect = {}) {}
     }
 }
 
 @Immutable
-private data class CurrencySelectedItem(val currency: Currency, val isSelected: Boolean)
+data class CurrencySelectorItem(val currency: Currency, val isSelected: Boolean)
