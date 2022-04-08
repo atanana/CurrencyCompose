@@ -73,7 +73,7 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     }
 
     override fun onAmountChanged(amount: String) {
-        recalculateCurrencies() { currentState ->
+        recalculateCurrencies { currentState ->
             val newCurrencySelectorState = currentState.currencySelectorState.copy(amount = amount)
             currentState.copy(currencySelectorState = newCurrencySelectorState)
         }
