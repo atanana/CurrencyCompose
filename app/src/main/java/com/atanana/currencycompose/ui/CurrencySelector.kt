@@ -1,9 +1,6 @@
 package com.atanana.currencycompose.ui
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
@@ -35,7 +32,7 @@ fun CurrencySelector(
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.size(16.dp))
-        Button(onClick = { dialogState = true }) {
+        Button(onClick = { dialogState = true }, modifier = Modifier.height(54.dp)) {
             Text(text = state.currency.value)
         }
     }

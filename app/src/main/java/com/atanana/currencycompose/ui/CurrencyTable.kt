@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.data.Currency
@@ -29,7 +30,7 @@ fun CurrencyTable(currencies: List<CurrencyItem>, modifier: Modifier = Modifier)
 @Composable
 private fun CurrencyTableItem(item: CurrencyItem) {
     Row {
-        Text(text = "%.3f".format(item.amount))
+        Text(text = "%.3f".format(item.amount), fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.size(8.dp))
         Text(text = item.currency.value)
     }
