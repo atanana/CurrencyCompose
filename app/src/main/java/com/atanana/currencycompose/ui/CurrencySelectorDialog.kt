@@ -15,6 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.atanana.currencycompose.data.Currency
+import com.atanana.currencycompose.ui.theme.DOUBLE_PADDING
+import com.atanana.currencycompose.ui.theme.HALF_PADDING
+import com.atanana.currencycompose.ui.theme.PADDING
 
 @Composable
 fun CurrencySelectorDialog(
@@ -23,9 +26,9 @@ fun CurrencySelectorDialog(
     onDismiss: () -> Unit
 ) {
     Dialog(onDismissRequest = onDismiss) {
-        Box(Modifier.padding(vertical = 32.dp)) {
+        Box(Modifier.padding(vertical = DOUBLE_PADDING)) {
             Card(elevation = 8.dp, shape = RoundedCornerShape(8.dp)) {
-                LazyColumn(contentPadding = PaddingValues(vertical = 16.dp), modifier = Modifier.fillMaxWidth()) {
+                LazyColumn(contentPadding = PaddingValues(vertical = PADDING), modifier = Modifier.fillMaxWidth()) {
                     items(
                         items = currencies,
                         key = { it.value },
@@ -49,7 +52,7 @@ private fun CurrencyItem(
                 onSelect(currency)
                 onDismiss()
             }
-            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .padding(vertical = HALF_PADDING, horizontal = PADDING)
             .fillMaxWidth()
     )
 }

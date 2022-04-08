@@ -15,10 +15,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
+import com.atanana.currencycompose.ui.theme.HALF_PADDING
+import com.atanana.currencycompose.ui.theme.PADDING
 
 @Composable
 fun CurrencyTable(currencies: List<CurrencyItem>, modifier: Modifier = Modifier) {
-    LazyColumn(contentPadding = PaddingValues(16.dp), modifier = modifier) {
+    LazyColumn(contentPadding = PaddingValues(PADDING), modifier = modifier) {
         items(
             items = currencies,
             key = { it.currency.value },
@@ -31,7 +33,7 @@ fun CurrencyTable(currencies: List<CurrencyItem>, modifier: Modifier = Modifier)
 private fun CurrencyTableItem(item: CurrencyItem) {
     Row {
         Text(text = "%.3f".format(item.amount), fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.size(8.dp))
+        Spacer(modifier = Modifier.size(HALF_PADDING))
         Text(text = item.currency.value)
     }
 }

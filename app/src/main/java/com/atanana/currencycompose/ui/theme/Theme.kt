@@ -5,6 +5,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
+
+val HALF_PADDING = 8.dp
+val PADDING = 16.dp
+val DOUBLE_PADDING = 32.dp
 
 private val DarkColorPalette = darkColors(
     primary = Purple200,
