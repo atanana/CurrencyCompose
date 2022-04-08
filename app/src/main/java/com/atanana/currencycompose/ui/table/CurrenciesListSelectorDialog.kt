@@ -56,11 +56,10 @@ private fun DialogContent(
                 }
                 LazyColumn(contentPadding = PaddingValues(vertical = PADDING), modifier = Modifier.weight(1f)) {
                     items(
-                        items = items,
-                        key = { it.currency.value },
-                        itemContent = {
-                            CurrencyItem(it) {
-                                items[items.indexOf(it)] = it.copy(isSelected = !it.isSelected)
+                        items = items.withIndex().toList(),
+                        itemContent = { (i, item) ->
+                            CurrencyItem(item) {
+                                items[i] = item.copy(isSelected = !item.isSelected)
                             }
                         }
                     )
@@ -107,4 +106,5 @@ fun CurrencyListSelectorDialogPreview() {
     }
 }
 
+@Immutable
 private data class CurrencySelectedItem(val currency: Currency, val isSelected: Boolean)
