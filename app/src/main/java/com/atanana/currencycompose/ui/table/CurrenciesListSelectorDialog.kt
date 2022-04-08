@@ -8,12 +8,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.atanana.currencycompose.R
 import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 import com.atanana.currencycompose.ui.theme.DOUBLE_PADDING
@@ -31,12 +34,24 @@ fun CurrenciesListSelectorDialog(
     Dialog(onDismissRequest = onDismiss) {
         Box(Modifier.padding(vertical = DOUBLE_PADDING)) {
             Card(elevation = 8.dp, shape = RoundedCornerShape(8.dp)) {
-                LazyColumn(contentPadding = PaddingValues(vertical = PADDING), modifier = Modifier.fillMaxWidth()) {
-                    items(
-                        items = items,
-                        key = { it.currency.value },
-                        itemContent = { CurrencyItem(it) }
-                    )
+                Column {
+                    LazyColumn(contentPadding = PaddingValues(vertical = PADDING), modifier = Modifier.weight(1f)) {
+                        items(
+                            items = items,
+                            key = { it.currency.value },
+                            itemContent = { CurrencyItem(it) }
+                        )
+                    }
+                    Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                        TextButton(onClick = {
+                            val selectedCurrencies = items.filter { it.isSelected }
+                                .map { it.currency }
+                            onSelect(selectedCurrencies)
+                            onDismiss()
+                        }) {
+                            Text(text = stringResource(R.string.ok))
+                        }
+                    }
                 }
             }
         }
