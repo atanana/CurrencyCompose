@@ -1,4 +1,4 @@
-package com.atanana.currencycompose.ui
+package com.atanana.currencycompose.ui.selector
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions

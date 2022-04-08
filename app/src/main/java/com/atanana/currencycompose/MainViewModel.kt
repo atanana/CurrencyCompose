@@ -9,8 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.data.CurrencyRepository
 import com.atanana.currencycompose.ui.CurrencyAppActions
-import com.atanana.currencycompose.ui.CurrencyItem
-import com.atanana.currencycompose.ui.CurrencySelectorState
+import com.atanana.currencycompose.ui.selector.CurrencySelectorState
+import com.atanana.currencycompose.ui.table.CurrencyItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber

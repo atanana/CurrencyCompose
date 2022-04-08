@@ -1,4 +1,4 @@
-package com.atanana.currencycompose.ui
+package com.atanana.currencycompose.ui.table
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row

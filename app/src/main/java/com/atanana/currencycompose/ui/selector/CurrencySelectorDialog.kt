@@ -1,4 +1,4 @@
-package com.atanana.currencycompose.ui
+package com.atanana.currencycompose.ui.selector
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
