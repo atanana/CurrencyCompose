@@ -1,10 +1,7 @@
 package com.atanana.currencycompose.ui.table
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Text
@@ -25,7 +22,9 @@ fun CurrencyTable(
 ) {
     var dialogState by remember { mutableStateOf(false) }
 
-    LazyColumn(contentPadding = PaddingValues(PADDING), modifier = modifier.clickable { dialogState = true }) {
+    LazyColumn(contentPadding = PaddingValues(PADDING), modifier = modifier
+        .fillMaxHeight()
+        .clickable { dialogState = true }) {
         items(
             items = state.rows,
             key = { it.currency.value },
