@@ -34,11 +34,17 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     }
 
     private fun loadConversions(amount: String, currency: Currency) {
+        loadConversions(currency) {
+            state = createDefaultState(amount, currency)
+        }
+    }
+
+    private inline fun loadConversions(currency: Currency, crossinline block: () -> Unit) {
         viewModelScope.launch {
             try {
                 state = MainState.Loading
                 conversions = repository.getConversions(currency)
-                state = createDefaultState(amount, currency)
+                block()
                 recalculateCurrencies()
             } catch (e: Exception) {
                 Timber.e(e)
@@ -57,17 +63,9 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
 
     private fun updateConversions(currency: Currency) {
         val oldState = state as? MainState.Data ?: return
-        viewModelScope.launch {
-            try {
-                state = MainState.Loading
-                conversions = repository.getConversions(currency)
-                val amount = oldState.currencySelectorState.amount
-                state = oldState.copy(currencySelectorState = CurrencySelectorState(amount, currency))
-                recalculateCurrencies()
-            } catch (e: Exception) {
-                Timber.e(e)
-                state = MainState.Error("Cannot load data!")
-            }
+        loadConversions(currency) {
+            val amount = oldState.currencySelectorState.amount
+            state = oldState.copy(currencySelectorState = CurrencySelectorState(amount, currency))
         }
     }
 
