@@ -30,7 +30,7 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     private var selectedCurrencies = emptySet<Currency>()
 
     init {
-        loadConversions("1", Currency("USD"))
+        loadConversions(DEFAULT_AMOUNT, Currency("USD"))
     }
 
     private fun loadConversions(amount: String, currency: Currency) {
@@ -53,6 +53,22 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
         val currencySelectorState = CurrencySelectorState(amount, currency)
         val currencyTableState = CurrencyTableState(emptyList(), emptyList())
         return MainState.Data(currencySelectorState, currencyTableState, allCurrencies)
+    }
+
+    private fun updateConversions(currency: Currency) {
+        val oldState = state as? MainState.Data ?: return
+        viewModelScope.launch {
+            try {
+                state = MainState.Loading
+                conversions = repository.getConversions(currency)
+                val amount = oldState.currencySelectorState.amount
+                state = oldState.copy(currencySelectorState = CurrencySelectorState(amount, currency))
+                recalculateCurrencies()
+            } catch (e: Exception) {
+                Timber.e(e)
+                state = MainState.Error("Cannot load data!")
+            }
+        }
     }
 
     private fun recalculateCurrencies(block: ((MainState.Data) -> MainState.Data)? = null) = mapData { data ->
@@ -80,8 +96,7 @@ class MainViewModel @Inject constructor(private val repository: CurrencyReposito
     }
 
     override fun onCurrencySelected(currency: Currency) {
-        val amount = (state as? MainState.Data)?.currencySelectorState?.amount ?: DEFAULT_AMOUNT
-        loadConversions(amount, currency)
+        updateConversions(currency)
     }
 
     override fun onCurrenciesListChanged(currencies: List<Currency>) {
