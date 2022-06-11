@@ -1,6 +1,7 @@
 package com.atanana.currencycompose.data
 
 import com.atanana.currencycompose.data.network.Api
+import com.atanana.currencycompose.domain.Currency
 import javax.inject.Inject
 
 class CurrencyRepository @Inject constructor(private val api: Api) {
@@ -9,5 +10,3 @@ class CurrencyRepository @Inject constructor(private val api: Api) {
         api.getConversions(currency.value).conversionRates.mapKeys { Currency(it.key) }
 }
 
-@JvmInline
-value class Currency(val value: String)

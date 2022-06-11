@@ -9,7 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.atanana.currencycompose.data.Currency
+import com.atanana.currencycompose.domain.Currency
 import com.atanana.currencycompose.ui.theme.CurrencyComposeTheme
 import com.atanana.currencycompose.ui.theme.HALF_PADDING
 import com.atanana.currencycompose.ui.theme.PADDING

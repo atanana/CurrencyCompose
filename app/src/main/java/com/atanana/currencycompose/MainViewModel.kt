@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.atanana.currencycompose.data.Currency
 import com.atanana.currencycompose.data.CurrencyRepository
+import com.atanana.currencycompose.domain.Currency
 import com.atanana.currencycompose.ui.CurrencyAppActions
 import com.atanana.currencycompose.ui.selector.CurrencySelectorState
 import com.atanana.currencycompose.ui.table.CurrencyRow

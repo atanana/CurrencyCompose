@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.atanana.currencycompose.MainState
-import com.atanana.currencycompose.data.Currency
+import com.atanana.currencycompose.domain.Currency
 import com.atanana.currencycompose.ui.selector.CurrencySelector
 import com.atanana.currencycompose.ui.selector.CurrencySelectorState
 import com.atanana.currencycompose.ui.table.CurrencyRow

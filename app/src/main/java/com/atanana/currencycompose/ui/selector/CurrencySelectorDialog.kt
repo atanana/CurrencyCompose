@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.atanana.currencycompose.data.Currency
+import com.atanana.currencycompose.domain.Currency
 import com.atanana.currencycompose.ui.theme.DOUBLE_PADDING
 import com.atanana.currencycompose.ui.theme.HALF_PADDING
 import com.atanana.currencycompose.ui.theme.PADDING
