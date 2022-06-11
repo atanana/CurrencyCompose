@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.atanana.currencycompose.domain.Currency
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -12,16 +13,19 @@ import javax.inject.Singleton
 
 private const val PREFERENCES_CURRENCY = "currency"
 
-private val KEY_AMOUNT = floatPreferencesKey("amount")
+private val KEY_AMOUNT = stringPreferencesKey("amount")
 private val KEY_MAIN_CURRENCY = stringPreferencesKey("main_currency")
 private val KEY_SELECTED_CURRENCIES = stringPreferencesKey("selected_currencies")
+
+private const val DEFAULT_AMOUNT = "1"
+private const val DEFAULT_CURRENCY = "USD"
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = PREFERENCES_CURRENCY)
 
 @Singleton
-class PreferencesProvider @Inject constructor(private val context: Context) {
+class PreferencesProvider @Inject constructor(@ApplicationContext private val context: Context) {
 
-    suspend fun setAmount(amount: Float) {
+    suspend fun setAmount(amount: String) {
         savePreference { preferences -> preferences[KEY_AMOUNT] = amount }
     }
 
@@ -29,8 +33,9 @@ class PreferencesProvider @Inject constructor(private val context: Context) {
         savePreference { preferences -> preferences[KEY_MAIN_CURRENCY] = currency.value }
     }
 
-    suspend fun setSelectedCurrencies(currencies: Set<Currency>) {
-        savePreference { preferences -> preferences[KEY_SELECTED_CURRENCIES] = currencies.joinToString(separator = ",") }
+    suspend fun setSelectedCurrencies(currencies: List<Currency>) {
+        val currenciesString = currencies.joinToString(separator = ",") { it.value }
+        savePreference { preferences -> preferences[KEY_SELECTED_CURRENCIES] = currenciesString }
     }
 
     private suspend inline fun savePreference(noinline block: (MutablePreferences) -> Unit) {
@@ -38,8 +43,8 @@ class PreferencesProvider @Inject constructor(private val context: Context) {
     }
 
     val preferences: Flow<CurrencyPreferences> = context.dataStore.data.map { preferences ->
-        val amount = preferences[KEY_AMOUNT] ?: 1f
-        val mainCurrency = Currency(preferences[KEY_MAIN_CURRENCY] ?: "USD")
+        val amount = preferences[KEY_AMOUNT] ?: DEFAULT_AMOUNT
+        val mainCurrency = Currency(preferences[KEY_MAIN_CURRENCY] ?: DEFAULT_CURRENCY)
         val selectedCurrencies = extractSelectedCurrencies(preferences)
         CurrencyPreferences(amount, mainCurrency, selectedCurrencies)
     }
@@ -51,7 +56,7 @@ class PreferencesProvider @Inject constructor(private val context: Context) {
     }
 }
 
-data class CurrencyPreferences(val amount: Float, val mainCurrency: Currency, val selectedCurrencies: SelectedCurrencies)
+data class CurrencyPreferences(val amount: String, val mainCurrency: Currency, val selectedCurrencies: SelectedCurrencies)
 
 sealed class SelectedCurrencies {
 

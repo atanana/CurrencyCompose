@@ -8,98 +8,95 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.atanana.currencycompose.data.CurrencyRepository
 import com.atanana.currencycompose.domain.Currency
+import com.atanana.currencycompose.preferences.CurrencyPreferences
+import com.atanana.currencycompose.preferences.PreferencesProvider
+import com.atanana.currencycompose.preferences.SelectedCurrencies
 import com.atanana.currencycompose.ui.CurrencyAppActions
 import com.atanana.currencycompose.ui.selector.CurrencySelectorState
 import com.atanana.currencycompose.ui.table.CurrencyRow
 import com.atanana.currencycompose.ui.table.CurrencySelectorItem
 import com.atanana.currencycompose.ui.table.CurrencyTableState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val DEFAULT_AMOUNT = "1"
-
 @HiltViewModel
-class MainViewModel @Inject constructor(private val repository: CurrencyRepository) : ViewModel(), CurrencyAppActions {
+class MainViewModel @Inject constructor(
+    private val repository: CurrencyRepository,
+    private val preferencesProvider: PreferencesProvider
+) : ViewModel(), CurrencyAppActions {
 
     var state by mutableStateOf<MainState>(MainState.Loading)
         private set
 
     private lateinit var conversions: Map<Currency, Double>
-    private var selectedCurrencies = emptySet<Currency>()
 
     init {
-        loadConversions(DEFAULT_AMOUNT, Currency("USD"))
-    }
-
-    private fun loadConversions(amount: String, currency: Currency) {
-        loadConversions(currency) {
-            state = createDefaultState(amount, currency)
-        }
-    }
-
-    private inline fun loadConversions(currency: Currency, crossinline block: () -> Unit) {
-        viewModelScope.launch {
-            try {
-                state = MainState.Loading
-                conversions = repository.getConversions(currency)
-                block()
-                recalculateCurrencies()
-            } catch (e: Exception) {
-                Timber.e(e)
-                state = MainState.Error("Cannot load data!")
+        preferencesProvider.preferences
+            .runningFold(Pair<CurrencyPreferences?, CurrencyPreferences?>(null, null)) { (_, second), current -> Pair(second, current) }
+            .onEach { (old, new) -> processPreferences(old, new) }
+            .catch {
+                Timber.e(it)
+                state = MainState.Error("Something is wrong!")
             }
-        }
+            .launchIn(viewModelScope)
     }
 
-    private fun createDefaultState(amount: String, currency: Currency): MainState.Data {
+    private suspend fun processPreferences(old: CurrencyPreferences?, new: CurrencyPreferences?) {
+        new ?: return
+        if (old?.mainCurrency != new.mainCurrency) {
+            state = MainState.Loading
+            conversions = repository.getConversions(new.mainCurrency)
+        }
+        state = mapPreferencesToState(new)
+    }
+
+    private fun mapPreferencesToState(preferences: CurrencyPreferences): MainState {
         val allCurrencies = conversions.keys.toList()
-        selectedCurrencies = allCurrencies.toSet()
-        val currencySelectorState = CurrencySelectorState(amount, currency)
-        val currencyTableState = CurrencyTableState(emptyList(), emptyList())
+        val currencySelectorState = CurrencySelectorState(preferences.amount, preferences.mainCurrency)
+
+        val amount = preferences.amount.toDoubleOrNull() ?: 0.0
+        val currencyRows = getCurrencyRows(amount, preferences.selectedCurrencies)
+        val currencySelectorItems = getCurrencySelectorItems(preferences.selectedCurrencies)
+        val currencyTableState = CurrencyTableState(currencyRows, currencySelectorItems)
+
         return MainState.Data(currencySelectorState, currencyTableState, allCurrencies)
     }
 
-    private fun updateConversions(currency: Currency) {
-        val oldState = state as? MainState.Data ?: return
-        loadConversions(currency) {
-            val amount = oldState.currencySelectorState.amount
-            state = oldState.copy(currencySelectorState = CurrencySelectorState(amount, currency))
+    private fun getCurrencyRows(amount: Double, selectedCurrencies: SelectedCurrencies): List<CurrencyRow> {
+        val currencies = when (selectedCurrencies) {
+            SelectedCurrencies.Default -> conversions
+            is SelectedCurrencies.Selected -> conversions.filter { selectedCurrencies.currencies.contains(it.key) }
         }
+        return currencies.map { (currency, value) -> CurrencyRow(currency, value * amount) }
     }
 
-    private fun recalculateCurrencies(block: ((MainState.Data) -> MainState.Data)? = null) = mapData { data ->
-        val newState = if (block != null) block(data) else data
-        val amount = newState.currencySelectorState.amount.toDoubleOrNull() ?: 0.0
-        val currencyRows = conversions
-            .filter { selectedCurrencies.contains(it.key) }
-            .map { (currency, value) -> CurrencyRow(currency, value * amount) }
-        val currencySelectorItems = newState.allCurrencies.map { CurrencySelectorItem(it, selectedCurrencies.contains(it)) }
-        newState.copy(currenciesTableState = CurrencyTableState(currencyRows, currencySelectorItems))
-    }
-
-    private fun mapData(block: ((MainState.Data) -> MainState.Data)) {
-        val state = state
-        if (state is MainState.Data) {
-            this.state = block(state)
-        }
+    private fun getCurrencySelectorItems(selectedCurrencies: SelectedCurrencies): List<CurrencySelectorItem> = when (selectedCurrencies) {
+        SelectedCurrencies.Default -> conversions.keys.map { CurrencySelectorItem(it, true) }
+        is SelectedCurrencies.Selected -> conversions.keys.map { CurrencySelectorItem(it, selectedCurrencies.currencies.contains(it)) }
     }
 
     override fun onAmountChanged(amount: String) {
-        recalculateCurrencies { currentState ->
-            val newCurrencySelectorState = currentState.currencySelectorState.copy(amount = amount)
-            currentState.copy(currencySelectorState = newCurrencySelectorState)
+        viewModelScope.launch {
+            preferencesProvider.setAmount(amount)
         }
     }
 
     override fun onCurrencySelected(currency: Currency) {
-        updateConversions(currency)
+        viewModelScope.launch {
+            preferencesProvider.setMainCurrency(currency)
+        }
     }
 
     override fun onCurrenciesListChanged(currencies: List<Currency>) {
-        selectedCurrencies = currencies.toSet()
-        recalculateCurrencies()
+        viewModelScope.launch {
+            preferencesProvider.setSelectedCurrencies(currencies)
+        }
     }
 }
 
