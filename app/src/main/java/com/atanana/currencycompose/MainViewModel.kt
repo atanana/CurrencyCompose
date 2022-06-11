@@ -51,7 +51,7 @@ class MainViewModel @Inject constructor(
         new ?: return
         if (old?.mainCurrency != new.mainCurrency) {
             state = MainState.Loading
-            conversions = repository.getConversions(new.mainCurrency)
+            conversions = repository.getConversions(new.mainCurrency).toSortedMap(compareBy { it.value })
         }
         state = mapPreferencesToState(new)
     }
