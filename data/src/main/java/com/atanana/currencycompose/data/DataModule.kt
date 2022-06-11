@@ -8,6 +8,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
+//todo hide this
 private const val API_KEY = "995f51168b2950a6b4f31365"
 
 @Module
